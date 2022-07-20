@@ -1,41 +1,37 @@
 package com.example.apidatapractise
-
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.apidatapractise.Model.User
 import com.example.apidatapractise.Model.UserList
 import com.example.apidatapractise.viewModel.MainActivityViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(){
+class MainActivity : AppCompatActivity() {
 
     lateinit var recyclerViewAdapter: RecyclerViewAdapter
-    lateinit var viewModel: MainActivityViewModel
+    private val mainViewModel by viewModel<MainActivityViewModel>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         initRecyclerView()
         initViewModel()
         searchUser()
-
-
     }
+
 
     private fun searchUser() {
         search_button.setOnClickListener {
-            if(!TextUtils.isEmpty(searchEditText.text.toString())) {
-                viewModel.searchUser(searchEditText.text.toString())
+            if (!TextUtils.isEmpty(searchEditText.text.toString())) {
+                mainViewModel.searchUser(searchEditText.text.toString())
             } else {
-                viewModel.getUsersList()
+                mainViewModel.getUsersList()
             }
         }
     }
@@ -43,7 +39,8 @@ class MainActivity : AppCompatActivity(){
     private fun initRecyclerView() {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            val decoration = DividerItemDecoration(this@MainActivity, DividerItemDecoration.VERTICAL)
+            val decoration =
+                DividerItemDecoration(this@MainActivity, DividerItemDecoration.VERTICAL)
             addItemDecoration(decoration)
             recyclerViewAdapter = RecyclerViewAdapter()
             adapter = recyclerViewAdapter
@@ -52,19 +49,16 @@ class MainActivity : AppCompatActivity(){
     }
 
     fun initViewModel() {
-        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
-        viewModel.getUserListObserverable().observe(this, Observer<UserList> {
-            if(it == null) {
+        mainViewModel.getUserListObserverable().observe(this, Observer<UserList> {
+            if (it == null) {
                 Toast.makeText(this@MainActivity, "no result found...", Toast.LENGTH_LONG).show()
             } else {
                 recyclerViewAdapter.userList = it.data.toMutableList()
                 recyclerViewAdapter.notifyDataSetChanged()
             }
         })
-        viewModel.getUsersList()
+        mainViewModel.getUsersList()
     }
-
-
 
 
 }

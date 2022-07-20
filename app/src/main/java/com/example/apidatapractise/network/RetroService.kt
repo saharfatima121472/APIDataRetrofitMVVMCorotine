@@ -17,7 +17,7 @@ interface RetroService {
     //https://gorest.co.in/public-api/users?name=a
     @GET("users")
     @Headers("Accept:application/json", "Content-Type:application/json")
-     fun searchUsers(@Query("name") searchText: String): Call<UserList>
+    suspend fun searchUsers(@Query("name") searchText: String): UserList
 
 
 }
